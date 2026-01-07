@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/background"
+    android:padding="32dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/apptitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MeetVerse"
+        android:textColor="@android:color/white"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Schedule Smart, Meet Better"
+        android:textColor="#EDEAEA"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="40dp"/>
+
+    <Button
+        android:id="@+id/btnSignUp"
+        android:layout_width="156dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:elevation="8dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:text="Sign Up"
+        android:textColor="@android:color/white"
+        android:textSize="15sp"
+        app:backgroundTint="#806E8AB6"
+        app:cornerRadius="15dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/footer_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have an account?"
+            android:textColor="#EDEAEA"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/login_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Login"
+            android:textColor="#EDEAEA"
+            android:textSize="12sp"
+            android:layout_marginStart="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:textStyle="normal"
+            android:textColorLink="#EDEAEA"
+            android:textAllCaps="false"/>
+    </LinearLayout>
+
+</LinearLayout>
