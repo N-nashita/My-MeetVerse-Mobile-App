@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/background_2"
     android:fillViewport="true">
 
     <LinearLayout
@@ -26,7 +26,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#806E8AB6"
+                android:background="#494b84ff"
                 android:padding="24dp">
 
                 <TextView
@@ -42,7 +42,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
-                    android:hint="Email">
+                    android:hint="Email"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/emailField"
@@ -56,7 +57,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:hint="Password">
+                    android:hint="Password"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/passwordField"
@@ -90,8 +92,8 @@
                     android:text="Login"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    app:backgroundTint="#80385885"
-                    app:cornerRadius="15dp" />
+                    app:backgroundTint="#696a8aff"
+                    app:cornerRadius="20dp" />
 
             </LinearLayout>
 

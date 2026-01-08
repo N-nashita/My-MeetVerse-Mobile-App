@@ -17,6 +17,10 @@
         <activity android:name=".SignupActivity" android:exported="false"
             tools:ignore="Instantiatable" />
 
+        <activity android:name=".AdminDashboardActivity" android:exported="false" />
+
+        <activity android:name=".UserdashboardActivity" android:exported="false" />
+
         <activity android:name=".MainActivity" android:exported="true"
             tools:ignore="Instantiatable">
             <intent-filter>

@@ -48,7 +48,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Admin Dashboard"
+                android:text="User Dashboard"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_gravity="center"/>
@@ -63,7 +63,7 @@
         android:background="@android:color/black"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
-        app:menu="@menu/admin_menu"
+        app:menu="@menu/user_menu"
         app:headerLayout="@layout/nav_header"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
