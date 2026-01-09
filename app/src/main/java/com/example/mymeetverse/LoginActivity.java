@@ -1,21 +1,25 @@
 package com.example.mymeetverse;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
     TextInputEditText emailField, passwordField;
-    AutoCompleteTextView roleDropdown;
     Button btnLogin;
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,31 +28,57 @@ public class LoginActivity extends AppCompatActivity {
 
         emailField = findViewById(R.id.emailField);
         passwordField = findViewById(R.id.passwordField);
-        roleDropdown = findViewById(R.id.roleDropdown);
         btnLogin = findViewById(R.id.btnLogin);
 
-        String[] roles = new String[]{"User", "Admin"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, roles);
-        roleDropdown.setAdapter(adapter);
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
+        databaseReference = database.getReference("Users");
 
         btnLogin.setOnClickListener(v -> {
             String email = emailField.getText().toString().trim();
             String password = passwordField.getText().toString().trim();
-            String role = roleDropdown.getText().toString().trim();
 
-            if (email.isEmpty() || password.isEmpty() || role.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Intent intent;
-            if (role.equals("Admin")) {
-                intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-            } else {
-                intent = new Intent(LoginActivity.this, UserdashboardActivity.class);
-            }
-            startActivity(intent);
-            finish();
+            databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            User user = userSnapshot.getValue(User.class);
+
+                            if (user != null && user.getPassword().equals(password)) {
+                                Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+
+                                Intent intent;
+                                if (user.getRole().equals("Admin")) {
+                                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                                } else {
+                                    intent = new Intent(LoginActivity.this, UserdashboardActivity.class);
+                                }
+                                intent.putExtra("USER_NAME", user.getName());
+                                intent.putExtra("USER_EMAIL", user.getEmail());
+                                intent.putExtra("USER_ROLE", user.getRole());
+                                startActivity(intent);
+                                finish();
+                                return;
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Email not registered", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 }

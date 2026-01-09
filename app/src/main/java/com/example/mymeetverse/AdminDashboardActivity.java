@@ -1,5 +1,6 @@
 package com.example.mymeetverse;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -37,7 +38,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     Toast.makeText(AdminDashboardActivity.this, "Home", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_requests) {
-                    Toast.makeText(AdminDashboardActivity.this, "Requests", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(AdminDashboardActivity.this, MeetingRequestsActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     Toast.makeText(AdminDashboardActivity.this, "Settings", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_users) {

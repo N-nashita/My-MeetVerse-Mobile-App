@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648915598356",
+    "project_id": "my-meetverse-app",
+    "storage_bucket": "my-meetverse-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648915598356:android:40254dabe00a004860bb01",
+        "android_client_info": {
+          "package_name": "com.example.mymeetverse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdmx_9F641pF3DOItDLmxvl-QRctB9ElQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

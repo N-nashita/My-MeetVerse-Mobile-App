@@ -1,5 +1,6 @@
 package com.example.mymeetverse;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -17,6 +18,8 @@ public class UserdashboardActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     NavigationView navigationView;
     ImageView menuIcon;
+    
+    String userEmail, userName, userRole;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,12 @@ public class UserdashboardActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
+
+        // Get user info from intent
+        Intent receivedIntent = getIntent();
+        userEmail = receivedIntent.getStringExtra("USER_EMAIL");
+        userName = receivedIntent.getStringExtra("USER_NAME");
+        userRole = receivedIntent.getStringExtra("USER_ROLE");
 
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
@@ -37,7 +46,10 @@ public class UserdashboardActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     Toast.makeText(UserdashboardActivity.this, "Home", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_launch) {
-                    Toast.makeText(UserdashboardActivity.this, "Launch", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(UserdashboardActivity.this, LaunchMeetingActivity.class);
+                    intent.putExtra("USER_EMAIL", userEmail);
+                    intent.putExtra("USER_NAME", userName);
+                    startActivity(intent);
                 } else if (id == R.id.nav_users) {
                     Toast.makeText(UserdashboardActivity.this, "Users", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_history) {
