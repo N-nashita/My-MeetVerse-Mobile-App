@@ -26,7 +26,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#494b84ff"
+                android:background="#6DC2D3FB"
                 android:padding="20dp">
 
                 <TextView
@@ -40,7 +40,6 @@
                     android:layout_gravity="center"
                     android:layout_marginBottom="16dp"/>
 
-                <!-- Meeting Name -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -56,7 +55,6 @@
                         android:padding="8dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Meeting Description -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -94,7 +92,6 @@
                         android:drawablePadding="8dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Time Picker -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -114,7 +111,6 @@
                         android:drawablePadding="8dp"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Select Participants Button -->
                 <Button
                     android:id="@+id/btnSelectParticipants"
                     android:layout_width="match_parent"
@@ -124,29 +120,9 @@
                     android:text="Select Participants"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
-                    app:backgroundTint="#696a8aff"
+                    app:backgroundTint="#89274BD7"
                     app:cornerRadius="20dp" />
 
-                <!-- Participants List -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Selected Participants:"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/black"
-                    android:layout_marginTop="12dp"/>
-
-                <ListView
-                    android:id="@+id/participantsListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:color/white"
-                    android:divider="@android:color/darker_gray"
-                    android:dividerHeight="1dp"/>
-
-                <!-- Launch Meeting Button -->
                 <Button
                     android:id="@+id/btnLaunchMeeting"
                     android:layout_width="match_parent"
@@ -156,7 +132,7 @@
                     android:text="Launch Meeting"
                     android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    app:backgroundTint="#696a8aff"
+                    app:backgroundTint="#89274BD7"
                     app:cornerRadius="20dp" />
 
             </LinearLayout>

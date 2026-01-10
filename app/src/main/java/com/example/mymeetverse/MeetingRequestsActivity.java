@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class MeetingRequestsActivity extends AppCompatActivity {
 
@@ -27,6 +28,7 @@ public class MeetingRequestsActivity extends AppCompatActivity {
     ArrayList<Meeting> meetingRequests;
     MeetingRequestAdapter adapter;
     DatabaseReference meetingsReference;
+    DatabaseReference approvedMeetingsReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +40,7 @@ public class MeetingRequestsActivity extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         meetingsReference = database.getReference("MeetingRequests");
+        approvedMeetingsReference = database.getReference("ApprovedMeetings");
 
         adapter = new MeetingRequestAdapter();
         requestsListView.setAdapter(adapter);
@@ -75,10 +78,22 @@ public class MeetingRequestsActivity extends AppCompatActivity {
     }
 
     private void approveMeeting(Meeting meeting) {
-        meetingsReference.child(meeting.getMeetingId()).child("status").setValue("approved")
+        // Generate unique meeting link
+        String uniqueLink = "https://meet.mymeetverse.com/" + UUID.randomUUID().toString().substring(0, 8);
+        meeting.setMeetingLink(uniqueLink);
+        meeting.setStatus("approved");
+        
+        // Save to ApprovedMeetings
+        approvedMeetingsReference.child(meeting.getMeetingId()).setValue(meeting)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(this, "Meeting approved!", Toast.LENGTH_SHORT).show();
+                    // Update status in MeetingRequests
+                    meetingsReference.child(meeting.getMeetingId()).child("status").setValue("approved")
+                        .addOnCompleteListener(task2 -> {
+                            if (task2.isSuccessful()) {
+                                Toast.makeText(this, "Meeting approved and link generated!", Toast.LENGTH_LONG).show();
+                            }
+                        });
                 } else {
                     Toast.makeText(this, "Failed to approve meeting", Toast.LENGTH_SHORT).show();
                 }

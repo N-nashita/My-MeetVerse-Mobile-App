@@ -1,5 +1,7 @@
 package com.example.mymeetverse;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
@@ -13,8 +15,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,14 +30,14 @@ public class LaunchMeetingActivity extends AppCompatActivity {
 
     TextInputEditText meetingNameField, meetingDescriptionField, dateField, timeField;
     Button btnSelectParticipants, btnLaunchMeeting;
-    ListView participantsListView;
     
     Calendar calendar;
     ArrayList<String> selectedParticipants;
-    ArrayAdapter<String> participantsAdapter;
     DatabaseReference meetingsReference;
+    DatabaseReference usersReference;
     
     String userEmail, userName;
+    ArrayList<User> allUsers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +50,10 @@ public class LaunchMeetingActivity extends AppCompatActivity {
         timeField = findViewById(R.id.timeField);
         btnSelectParticipants = findViewById(R.id.btnSelectParticipants);
         btnLaunchMeeting = findViewById(R.id.btnLaunchMeeting);
-        participantsListView = findViewById(R.id.participantsListView);
 
         calendar = Calendar.getInstance();
         selectedParticipants = new ArrayList<>();
-        participantsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, selectedParticipants);
-        participantsListView.setAdapter(participantsAdapter);
+        allUsers = new ArrayList<>();
 
         // Get user info from intent
         Intent intent = getIntent();
@@ -59,6 +62,9 @@ public class LaunchMeetingActivity extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         meetingsReference = database.getReference("MeetingRequests");
+        usersReference = database.getReference("Users");
+
+        loadUsers();
 
         dateField.setOnClickListener(v -> {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
@@ -96,9 +102,7 @@ public class LaunchMeetingActivity extends AppCompatActivity {
         });
 
         btnSelectParticipants.setOnClickListener(v -> {
-            Toast.makeText(this, "Select participants feature coming soon", Toast.LENGTH_SHORT).show();
-            selectedParticipants.add("Sample User");
-            participantsAdapter.notifyDataSetChanged();
+            showParticipantSelectionDialog();
         });
 
         btnLaunchMeeting.setOnClickListener(v -> {
@@ -114,6 +118,71 @@ public class LaunchMeetingActivity extends AppCompatActivity {
             
             saveMeetingRequest(meetingName, description, date, time);
         });
+    }
+
+    private void loadUsers() {
+        usersReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                allUsers.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null && !user.getEmail().equals(userEmail)) {
+                        allUsers.add(user);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(LaunchMeetingActivity.this, 
+                    "Failed to load users", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showParticipantSelectionDialog() {
+        if (allUsers.isEmpty()) {
+            Toast.makeText(this, "No users available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] userNames = new String[allUsers.size()];
+        boolean[] checkedItems = new boolean[allUsers.size()];
+        
+        for (int i = 0; i < allUsers.size(); i++) {
+            User user = allUsers.get(i);
+            userNames[i] = user.getName() + " (" + user.getEmail() + ")";
+            checkedItems[i] = selectedParticipants.contains(userNames[i]);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Participants");
+        
+        builder.setMultiChoiceItems(userNames, checkedItems, (dialog, which, isChecked) -> {
+            checkedItems[which] = isChecked;
+        });
+
+        builder.setPositiveButton("Done", (dialog, which) -> {
+            selectedParticipants.clear();
+            for (int i = 0; i < checkedItems.length; i++) {
+                if (checkedItems[i]) {
+                    selectedParticipants.add(userNames[i]);
+                }
+            }
+            
+            if (selectedParticipants.isEmpty()) {
+                Toast.makeText(LaunchMeetingActivity.this, 
+                    "No participants selected", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LaunchMeetingActivity.this, 
+                    selectedParticipants.size() + " participant(s) selected", 
+                    Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
     }
 
     private void saveMeetingRequest(String meetingName, String description, String date, String time) {

@@ -55,12 +55,15 @@ public class LoginActivity extends AppCompatActivity {
                                 Intent intent;
                                 if (user.getRole().equals("Admin")) {
                                     intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                                    intent.putExtra("ADMIN_NAME", user.getName());
+                                    intent.putExtra("ADMIN_EMAIL", user.getEmail());
                                 } else {
                                     intent = new Intent(LoginActivity.this, UserdashboardActivity.class);
+                                    intent.putExtra("USER_NAME", user.getName());
+                                    intent.putExtra("USER_EMAIL", user.getEmail());
+                                    intent.putExtra("USER_ROLE", user.getRole());
                                 }
-                                intent.putExtra("USER_NAME", user.getName());
-                                intent.putExtra("USER_EMAIL", user.getEmail());
-                                intent.putExtra("USER_ROLE", user.getRole());
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 finish();
                                 return;

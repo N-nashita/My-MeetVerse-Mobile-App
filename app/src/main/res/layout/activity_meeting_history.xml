@@ -25,13 +25,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_sort_by_size"
-                android:tint="@android:color/white"
-                android:contentDescription="Menu"/>
+                android:contentDescription="Menu"
+                app:tint="@android:color/white" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MeetVerse"
+                android:text="Meeting History"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -46,7 +46,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Approved Meetings"
+                android:text="Past Meetings"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 android:layout_gravity="center"
@@ -54,7 +54,7 @@
                 android:layout_margin="16dp"/>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/meetingsRecyclerView"
+                android:id="@+id/historyRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
@@ -71,7 +71,6 @@
         android:background="@android:color/black"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
-        app:menu="@menu/admin_menu"
         app:headerLayout="@layout/nav_header"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

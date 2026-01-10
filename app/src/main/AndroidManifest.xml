@@ -28,6 +28,10 @@
 
         <activity android:name=".MeetingRequestsActivity" android:exported="false" />
 
+        <activity android:name=".SignedInUsersActivity" android:exported="false" />
+
+        <activity android:name=".MeetingHistoryActivity" android:exported="false" />
+
         <activity android:name=".MainActivity" android:exported="true"
             tools:ignore="Instantiatable">
             <intent-filter>

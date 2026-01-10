@@ -13,6 +13,7 @@ public class Meeting {
     private ArrayList<String> participants;
     private String status;
     private long timestamp;
+    private String meetingLink;
 
     public Meeting() {}
 
@@ -108,5 +109,13 @@ public class Meeting {
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getMeetingLink() {
+        return meetingLink;
+    }
+
+    public void setMeetingLink(String meetingLink) {
+        this.meetingLink = meetingLink;
     }
 }
