@@ -59,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,6 +73,28 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Organizer"
+                android:textSize="14sp"
+                android:textColor="#616161"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="👤 "
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tvCardParticipants"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Participants"
                 android:textSize="14sp"
                 android:textColor="#616161"/>
         </LinearLayout>

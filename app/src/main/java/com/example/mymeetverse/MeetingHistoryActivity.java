@@ -87,6 +87,8 @@ public class MeetingHistoryActivity extends AppCompatActivity {
                     Intent intent;
                     if (userRole != null && userRole.equalsIgnoreCase("admin")) {
                         intent = new Intent(MeetingHistoryActivity.this, AdminDashboardActivity.class);
+                        intent.putExtra("ADMIN_EMAIL", userEmail);
+                        intent.putExtra("ADMIN_NAME", userName);
                     } else {
                         intent = new Intent(MeetingHistoryActivity.this, UserdashboardActivity.class);
                         intent.putExtra("USER_EMAIL", userEmail);
@@ -97,11 +99,14 @@ public class MeetingHistoryActivity extends AppCompatActivity {
                     finish();
                 } else if (id == R.id.nav_requests) {
                     Intent intent = new Intent(MeetingHistoryActivity.this, MeetingRequestsActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", userEmail);
+                    intent.putExtra("ADMIN_NAME", userName);
                     startActivity(intent);
                 } else if (id == R.id.nav_launch) {
                     Intent intent = new Intent(MeetingHistoryActivity.this, LaunchMeetingActivity.class);
                     intent.putExtra("USER_EMAIL", userEmail);
                     intent.putExtra("USER_NAME", userName);
+                    intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
                 } else if (id == R.id.nav_users) {
                     Intent intent = new Intent(MeetingHistoryActivity.this, SignedInUsersActivity.class);
@@ -112,7 +117,14 @@ public class MeetingHistoryActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_history) {
                     Toast.makeText(MeetingHistoryActivity.this, "Already on History page", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_settings) {
-                    Toast.makeText(MeetingHistoryActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    if (userRole != null && userRole.equalsIgnoreCase("admin")) {
+                        Intent intent = new Intent(MeetingHistoryActivity.this, SettingsActivity.class);
+                        intent.putExtra("ADMIN_EMAIL", userEmail);
+                        intent.putExtra("ADMIN_NAME", userName);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MeetingHistoryActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    }
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(MeetingHistoryActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MeetingHistoryActivity.this, LoginActivity.class);

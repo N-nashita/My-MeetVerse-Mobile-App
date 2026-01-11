@@ -80,6 +80,8 @@ public class SignedInUsersActivity extends AppCompatActivity {
                     Intent intent;
                     if (userRole != null && userRole.equalsIgnoreCase("admin")) {
                         intent = new Intent(SignedInUsersActivity.this, AdminDashboardActivity.class);
+                        intent.putExtra("ADMIN_EMAIL", userEmail);
+                        intent.putExtra("ADMIN_NAME", userName);
                     } else {
                         intent = new Intent(SignedInUsersActivity.this, UserdashboardActivity.class);
                         intent.putExtra("USER_EMAIL", userEmail);
@@ -90,14 +92,24 @@ public class SignedInUsersActivity extends AppCompatActivity {
                     finish();
                 } else if (id == R.id.nav_requests) {
                     Intent intent = new Intent(SignedInUsersActivity.this, MeetingRequestsActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", userEmail);
+                    intent.putExtra("ADMIN_NAME", userName);
                     startActivity(intent);
                 } else if (id == R.id.nav_launch) {
                     Intent intent = new Intent(SignedInUsersActivity.this, LaunchMeetingActivity.class);
                     intent.putExtra("USER_EMAIL", userEmail);
                     intent.putExtra("USER_NAME", userName);
+                    intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
                 } else if (id == R.id.nav_settings) {
-                    Toast.makeText(SignedInUsersActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    if (userRole != null && userRole.equalsIgnoreCase("admin")) {
+                        Intent intent = new Intent(SignedInUsersActivity.this, SettingsActivity.class);
+                        intent.putExtra("ADMIN_EMAIL", userEmail);
+                        intent.putExtra("ADMIN_NAME", userName);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(SignedInUsersActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    }
                 } else if (id == R.id.nav_users) {
                     Toast.makeText(SignedInUsersActivity.this, "Already on Users page", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_history) {
@@ -108,7 +120,7 @@ public class SignedInUsersActivity extends AppCompatActivity {
                     intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
                 } else if (id == R.id.nav_logout) {
-                    Toast.makeText(SignedInUsersActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignedInUsersActivity.this, "Logging out  ...", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(SignedInUsersActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();

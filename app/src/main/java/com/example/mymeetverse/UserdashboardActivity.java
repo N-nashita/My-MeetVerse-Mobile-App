@@ -96,6 +96,7 @@ public class UserdashboardActivity extends AppCompatActivity {
                     Intent intent = new Intent(UserdashboardActivity.this, LaunchMeetingActivity.class);
                     intent.putExtra("USER_EMAIL", userEmail);
                     intent.putExtra("USER_NAME", userName);
+                    intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
                 } else if (id == R.id.nav_users) {
                     Intent intent = new Intent(UserdashboardActivity.this, SignedInUsersActivity.class);
@@ -278,6 +279,21 @@ public class UserdashboardActivity extends AppCompatActivity {
             holder.tvCardDescription.setText(meeting.getDescription());
             holder.tvCardDateTime.setText(meeting.getDate() + " at " + meeting.getTime());
             holder.tvCardOrganizer.setText("Organized by: " + meeting.getRequestedByName());
+            
+            // Display participants
+            if (meeting.getParticipants() != null && !meeting.getParticipants().isEmpty()) {
+                StringBuilder participantsText = new StringBuilder("Participants: ");
+                for (int i = 0; i < meeting.getParticipants().size(); i++) {
+                    participantsText.append(meeting.getParticipants().get(i));
+                    if (i < meeting.getParticipants().size() - 1) {
+                        participantsText.append(", ");
+                    }
+                }
+                holder.tvCardParticipants.setText(participantsText.toString());
+            } else {
+                holder.tvCardParticipants.setText("Participants: None");
+            }
+            
             holder.tvCountdown.setText(calculateCountdown(meeting.getDate(), meeting.getTime()));
             
             // Show link only to participants
@@ -314,6 +330,7 @@ public class UserdashboardActivity extends AppCompatActivity {
             TextView tvCardDescription;
             TextView tvCardDateTime;
             TextView tvCardOrganizer;
+            TextView tvCardParticipants;
             TextView tvCountdown;
             TextView tvMeetingLink;
             Button btnCopyLink;
@@ -325,6 +342,7 @@ public class UserdashboardActivity extends AppCompatActivity {
                 tvCardDescription = itemView.findViewById(R.id.tvCardDescription);
                 tvCardDateTime = itemView.findViewById(R.id.tvCardDateTime);
                 tvCardOrganizer = itemView.findViewById(R.id.tvCardOrganizer);
+                tvCardParticipants = itemView.findViewById(R.id.tvCardParticipants);
                 tvCountdown = itemView.findViewById(R.id.tvCountdown);
                 tvMeetingLink = itemView.findViewById(R.id.tvMeetingLink);
                 btnCopyLink = itemView.findViewById(R.id.btnCopyLink);

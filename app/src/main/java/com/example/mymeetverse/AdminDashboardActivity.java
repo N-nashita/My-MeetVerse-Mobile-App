@@ -97,9 +97,14 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     Toast.makeText(AdminDashboardActivity.this, "Home", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.nav_requests) {
                     Intent intent = new Intent(AdminDashboardActivity.this, MeetingRequestsActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", adminEmail);
+                    intent.putExtra("ADMIN_NAME", adminName);
                     startActivity(intent);
                 } else if (id == R.id.nav_settings) {
-                    Toast.makeText(AdminDashboardActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(AdminDashboardActivity.this, SettingsActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", adminEmail);
+                    intent.putExtra("ADMIN_NAME", adminName);
+                    startActivity(intent);
                 } else if (id == R.id.nav_users) {
                     Intent intent = new Intent(AdminDashboardActivity.this, SignedInUsersActivity.class);
                     intent.putExtra("USER_ROLE", "admin");
@@ -282,6 +287,21 @@ public class AdminDashboardActivity extends AppCompatActivity {
             holder.tvCardDescription.setText(meeting.getDescription());
             holder.tvCardDateTime.setText(meeting.getDate() + " at " + meeting.getTime());
             holder.tvCardOrganizer.setText("Organized by: " + meeting.getRequestedByName());
+            
+            // Display participants
+            if (meeting.getParticipants() != null && !meeting.getParticipants().isEmpty()) {
+                StringBuilder participantsText = new StringBuilder("Participants: ");
+                for (int i = 0; i < meeting.getParticipants().size(); i++) {
+                    participantsText.append(meeting.getParticipants().get(i));
+                    if (i < meeting.getParticipants().size() - 1) {
+                        participantsText.append(", ");
+                    }
+                }
+                holder.tvCardParticipants.setText(participantsText.toString());
+            } else {
+                holder.tvCardParticipants.setText("Participants: None");
+            }
+            
             holder.tvCountdown.setText(calculateCountdown(meeting.getDate(), meeting.getTime()));
             
             // Admin can see all links
@@ -314,6 +334,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             TextView tvCardDescription;
             TextView tvCardDateTime;
             TextView tvCardOrganizer;
+            TextView tvCardParticipants;
             TextView tvCountdown;
             TextView tvMeetingLink;
             Button btnCopyLink;
@@ -325,6 +346,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 tvCardDescription = itemView.findViewById(R.id.tvCardDescription);
                 tvCardDateTime = itemView.findViewById(R.id.tvCardDateTime);
                 tvCardOrganizer = itemView.findViewById(R.id.tvCardOrganizer);
+                tvCardParticipants = itemView.findViewById(R.id.tvCardParticipants);
                 tvCountdown = itemView.findViewById(R.id.tvCountdown);
                 tvMeetingLink = itemView.findViewById(R.id.tvMeetingLink);
                 btnCopyLink = itemView.findViewById(R.id.btnCopyLink);

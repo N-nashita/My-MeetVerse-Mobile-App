@@ -3,16 +3,24 @@ package com.example.mymeetverse;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,19 +32,35 @@ import java.util.UUID;
 
 public class MeetingRequestsActivity extends AppCompatActivity {
 
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    ImageView menuIcon;
     ListView requestsListView;
     ArrayList<Meeting> meetingRequests;
     MeetingRequestAdapter adapter;
     DatabaseReference meetingsReference;
     DatabaseReference approvedMeetingsReference;
+    
+    String adminEmail, adminName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meeting_requests);
 
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navigationView);
+        menuIcon = findViewById(R.id.menuIcon);
         requestsListView = findViewById(R.id.requestsListView);
         meetingRequests = new ArrayList<>();
+
+        // Get admin info from intent
+        Intent receivedIntent = getIntent();
+        adminEmail = receivedIntent.getStringExtra("ADMIN_EMAIL");
+        adminName = receivedIntent.getStringExtra("ADMIN_NAME");
+        
+        if (adminEmail == null) adminEmail = "admin@gmail.com";
+        if (adminName == null) adminName = "Admin";
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         meetingsReference = database.getReference("MeetingRequests");
@@ -45,7 +69,76 @@ public class MeetingRequestsActivity extends AppCompatActivity {
         adapter = new MeetingRequestAdapter();
         requestsListView.setAdapter(adapter);
 
+        setupNavigationHeader();
+        setupNavigationMenu();
         loadMeetingRequests();
+        
+        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+    }
+    
+    private void setupNavigationHeader() {
+        View headerView = navigationView.getHeaderView(0);
+        TextView tvHeaderInitial = headerView.findViewById(R.id.tvHeaderInitial);
+        TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
+        TextView tvHeaderEmail = headerView.findViewById(R.id.tvHeaderEmail);
+        
+        tvHeaderInitial.setText("A");
+        tvHeaderName.setText(adminName);
+        tvHeaderEmail.setText(adminEmail);
+        
+        GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
+        background.setColor(Color.parseColor("#2C3E50"));
+    }
+    
+    private void setupNavigationMenu() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                
+                if (id == R.id.nav_home) {
+                    Intent intent = new Intent(MeetingRequestsActivity.this, AdminDashboardActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", adminEmail);
+                    intent.putExtra("ADMIN_NAME", adminName);
+                    startActivity(intent);
+                    finish();
+                } else if (id == R.id.nav_requests) {
+                    Toast.makeText(MeetingRequestsActivity.this, "Already on Requests page", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.nav_settings) {
+                    Intent intent = new Intent(MeetingRequestsActivity.this, SettingsActivity.class);
+                    intent.putExtra("ADMIN_EMAIL", adminEmail);
+                    intent.putExtra("ADMIN_NAME", adminName);
+                    startActivity(intent);
+                } else if (id == R.id.nav_users) {
+                    Intent intent = new Intent(MeetingRequestsActivity.this, SignedInUsersActivity.class);
+                    intent.putExtra("USER_ROLE", "admin");
+                    intent.putExtra("USER_NAME", adminName);
+                    intent.putExtra("USER_EMAIL", adminEmail);
+                    startActivity(intent);
+                } else if (id == R.id.nav_history) {
+                    Intent intent = new Intent(MeetingRequestsActivity.this, MeetingHistoryActivity.class);
+                    intent.putExtra("USER_ROLE", "admin");
+                    intent.putExtra("USER_NAME", adminName);
+                    intent.putExtra("USER_EMAIL", adminEmail);
+                    startActivity(intent);
+                } else if (id == R.id.nav_logout) {
+                    Toast.makeText(MeetingRequestsActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+    }
+    
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void loadMeetingRequests() {

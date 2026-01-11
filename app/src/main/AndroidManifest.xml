@@ -32,6 +32,8 @@
 
         <activity android:name=".MeetingHistoryActivity" android:exported="false" />
 
+        <activity android:name=".SettingsActivity" android:exported="false" />
+
         <activity android:name=".MainActivity" android:exported="true"
             tools:ignore="Instantiatable">
             <intent-filter>

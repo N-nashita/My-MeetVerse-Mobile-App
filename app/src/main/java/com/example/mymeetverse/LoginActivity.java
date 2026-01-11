@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity {
                                 Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
                                 Intent intent;
-                                if (user.getRole().equals("Admin")) {
+                                if (user.getRole() != null && user.getRole().equalsIgnoreCase("admin")) {
                                     intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
                                     intent.putExtra("ADMIN_NAME", user.getName());
                                     intent.putExtra("ADMIN_EMAIL", user.getEmail());
