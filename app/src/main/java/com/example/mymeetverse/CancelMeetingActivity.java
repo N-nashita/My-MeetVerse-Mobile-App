@@ -54,7 +54,6 @@ public class CancelMeetingActivity extends AppCompatActivity {
         meetingsListView = findViewById(R.id.meetingsListView);
         tvEmptyMessage = findViewById(R.id.tvEmptyMessage);
 
-        // Get user info from intent
         Intent receivedIntent = getIntent();
         userEmail = receivedIntent.getStringExtra("USER_EMAIL");
         userName = receivedIntent.getStringExtra("USER_NAME");
@@ -154,7 +153,6 @@ public class CancelMeetingActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Meeting meeting = dataSnapshot.getValue(Meeting.class);
                     if (meeting != null) {
-                        // Only show meetings launched by this user
                         if (meeting.getRequestedBy() != null && 
                             meeting.getRequestedBy().equalsIgnoreCase(userEmail)) {
                             userMeetings.add(meeting);
@@ -183,11 +181,9 @@ public class CancelMeetingActivity extends AppCompatActivity {
     }
 
     private void cancelMeeting(Meeting meeting) {
-        // Remove from ApprovedMeetings
         approvedMeetingsReference.child(meeting.getMeetingId()).removeValue()
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    // Also remove from MeetingRequests if exists
                     meetingRequestsReference.child(meeting.getMeetingId()).removeValue()
                         .addOnCompleteListener(task2 -> {
                             Toast.makeText(CancelMeetingActivity.this, 

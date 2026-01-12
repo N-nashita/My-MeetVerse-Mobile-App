@@ -45,6 +45,7 @@ public class UserdashboardActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     RecyclerView meetingsRecyclerView;
+    TextView tvEmptyMeetings;
     LinearLayout notificationBanner;
     TextView notificationText;
     ImageView dismissNotification;
@@ -66,7 +67,6 @@ public class UserdashboardActivity extends AppCompatActivity {
         menuIcon = findViewById(R.id.menuIcon);
         meetingsRecyclerView = findViewById(R.id.meetingsRecyclerView);
 
-        // Get user info from intent
         Intent receivedIntent = getIntent();
         userEmail = receivedIntent.getStringExtra("USER_EMAIL");
         userName = receivedIntent.getStringExtra("USER_NAME");
@@ -151,7 +151,6 @@ public class UserdashboardActivity extends AppCompatActivity {
         tvHeaderName.setText(userName != null ? userName : "User");
         tvHeaderEmail.setText(userEmail != null ? userEmail : "user@email.com");
         
-        // Set user color
         GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
         background.setColor(Color.parseColor("#7FB3D5"));
     }
@@ -183,8 +182,11 @@ public class UserdashboardActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 
                 if (approvedMeetings.isEmpty()) {
-                    Toast.makeText(UserdashboardActivity.this, 
-                        "No approved meetings yet", Toast.LENGTH_SHORT).show();
+                    tvEmptyMeetings.setVisibility(View.VISIBLE);
+                    meetingsRecyclerView.setVisibility(View.GONE);
+                } else {
+                    tvEmptyMeetings.setVisibility(View.GONE);
+                    meetingsRecyclerView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -206,7 +208,6 @@ public class UserdashboardActivity extends AppCompatActivity {
             return false;
         }
         
-        // Check if user is in the participants list
         for (String participantEmail : meeting.getParticipants()) {
             if (participantEmail != null && participantEmail.trim().equalsIgnoreCase(userEmail.trim())) {
                 return true;
@@ -310,7 +311,6 @@ public class UserdashboardActivity extends AppCompatActivity {
             holder.tvCardDateTime.setText(meeting.getDate() + " at " + meeting.getTime());
             holder.tvCardOrganizer.setText("Organized by: " + meeting.getRequestedByName());
             
-            // Display participants
             if (meeting.getParticipants() != null && !meeting.getParticipants().isEmpty()) {
                 StringBuilder participantsText = new StringBuilder("Participants: ");
                 for (int i = 0; i < meeting.getParticipants().size(); i++) {
@@ -326,7 +326,6 @@ public class UserdashboardActivity extends AppCompatActivity {
             
             holder.tvCountdown.setText(calculateCountdown(meeting.getDate(), meeting.getTime()));
             
-            // Show link only to participants
             if (isParticipant(meeting)) {
                 holder.linkContainer.setVisibility(View.VISIBLE);
                 if (meeting.getMeetingLink() != null && !meeting.getMeetingLink().isEmpty()) {

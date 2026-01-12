@@ -55,13 +55,11 @@ public class SignedInUsersActivity extends AppCompatActivity {
         usersRecyclerView = findViewById(R.id.usersRecyclerView);
         signedInUsers = new ArrayList<>();
 
-        // Get user info from intent
         Intent receivedIntent = getIntent();
         userRole = receivedIntent.getStringExtra("USER_ROLE");
         userEmail = receivedIntent.getStringExtra("USER_EMAIL");
         userName = receivedIntent.getStringExtra("USER_NAME");
 
-        // Set appropriate menu based on role
         if (userRole != null && userRole.equalsIgnoreCase("admin")) {
             navigationView.inflateMenu(R.menu.admin_menu);
         } else {
@@ -230,16 +228,13 @@ public class SignedInUsersActivity extends AppCompatActivity {
             holder.tvUserName.setText(user.getName());
             holder.tvUserEmail.setText(user.getEmail());
             
-            // Set initial and background color based on role
             String role = user.getRole() != null ? user.getRole().toLowerCase() : "user";
             if (role.equals("admin")) {
                 holder.tvUserInitial.setText("A");
-                // Dark color for admin
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();
-                background.setColor(Color.parseColor("#2C3E50"));
+                background.setColor(Color.parseColor("#141f64"));
             } else {
                 holder.tvUserInitial.setText("U");
-                // Light color for user
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();
                 background.setColor(Color.parseColor("#7FB3D5"));
             }

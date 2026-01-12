@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     TextInputEditText nameField, emailField, passwordField;
     Button btnSignup;
     DatabaseReference databaseReference;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class SignupActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.passwordField);
         btnSignup = findViewById(R.id.btnSignup);
 
+        firebaseAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         database.getReference(".info/connected").addValueEventListener(new ValueEventListener() {
             @Override
@@ -103,27 +107,36 @@ public class SignupActivity extends AppCompatActivity {
                     role = "Admin"; // First user - assign Admin role
                     Toast.makeText(SignupActivity.this, "You are the first user! Admin role assigned.", Toast.LENGTH_LONG).show();
                 } else {
-                    role = "User"; // Subsequent users - assign User role
+                    role = "User"; 
                 }
 
-                // Generate unique user ID
-                String userId = databaseReference.push().getKey();
-
-                User user = new User(userId, name, email, password, role);
-
-                // Save to database
-                if (userId != null) {
-                    databaseReference.child(userId).setValue(user).addOnCompleteListener(task -> {
+                firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(SignupActivity.this, "Registration successful as " + role, Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
-                            startActivity(intent); 
-                            finish();
+                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                            if (firebaseUser != null) {
+                                String userId = firebaseUser.getUid();
+                                
+                                User user = new User(userId, name, email, null, role);
+
+                                databaseReference.child(userId).setValue(user)
+                                    .addOnCompleteListener(dbTask -> {
+                                        if (dbTask.isSuccessful()) {
+                                            Toast.makeText(SignupActivity.this, "Registration successful as " + role, Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Toast.makeText(SignupActivity.this, "Failed to save user details", Toast.LENGTH_SHORT).show();
+                                            firebaseUser.delete();
+                                        }
+                                    });
+                            }
                         } else {
-                            Toast.makeText(SignupActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
+                            String errorMessage = task.getException() != null ? task.getException().getMessage() : "Registration failed";
+                            Toast.makeText(SignupActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                         }
                     });
-                }
             }
 
             @Override

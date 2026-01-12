@@ -37,6 +37,7 @@ public class MeetingHistoryActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     RecyclerView historyRecyclerView;
+    TextView tvEmptyHistory;
     
     ArrayList<Meeting> meetingHistory;
     HistoryAdapter adapter;
@@ -53,6 +54,7 @@ public class MeetingHistoryActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
         historyRecyclerView = findViewById(R.id.historyRecyclerView);
+        tvEmptyHistory = findViewById(R.id.tvEmptyHistory);
 
         Intent receivedIntent = getIntent();
         userEmail = receivedIntent.getStringExtra("USER_EMAIL");
@@ -196,8 +198,11 @@ public class MeetingHistoryActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 
                 if (meetingHistory.isEmpty()) {
-                    Toast.makeText(MeetingHistoryActivity.this, 
-                        "No meeting history", Toast.LENGTH_SHORT).show();
+                    tvEmptyHistory.setVisibility(View.VISIBLE);
+                    historyRecyclerView.setVisibility(View.GONE);
+                } else {
+                    tvEmptyHistory.setVisibility(View.GONE);
+                    historyRecyclerView.setVisibility(View.VISIBLE);
                 }
             }
 

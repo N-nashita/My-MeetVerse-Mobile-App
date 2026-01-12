@@ -45,6 +45,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     RecyclerView meetingsRecyclerView;
+    TextView tvEmptyMeetings;
     LinearLayout notificationBanner;
     TextView notificationText;
     ImageView dismissNotification;
@@ -67,16 +68,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
         meetingsRecyclerView = findViewById(R.id.meetingsRecyclerView);
+        tvEmptyMeetings = findViewById(R.id.tvEmptyMeetings);
         notificationBanner = findViewById(R.id.notificationBanner);
         notificationText = findViewById(R.id.notificationText);
         dismissNotification = findViewById(R.id.dismissNotification);
 
-        // Get admin info from intent login
         Intent receivedIntent = getIntent();
         adminEmail = receivedIntent.getStringExtra("ADMIN_EMAIL");
         adminName = receivedIntent.getStringExtra("ADMIN_NAME");
         
-        // Set default if not provided
         if (adminEmail == null) adminEmail = "admin@gmail.com";
         if (adminName == null) adminName = "Admin";
 
@@ -160,9 +160,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tvHeaderName.setText(adminName);
         tvHeaderEmail.setText(adminEmail);
         
-        // Set admin color
         GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
-        background.setColor(Color.parseColor("#2C3E50"));
+        background.setColor(Color.parseColor("#243a51"));
     }
     
     @Override
@@ -174,8 +173,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
     
     private void loadApprovedMeetings() {
-        Toast.makeText(this, "Loading meetings...", Toast.LENGTH_SHORT).show();
-        
         approvedMeetingsReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -198,13 +195,11 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 adapter.notifyDataSetChanged();
                 
                 if (approvedMeetings.isEmpty()) {
-                    Toast.makeText(AdminDashboardActivity.this, 
-                        "No approved meetings yet. Approve a meeting request first!", 
-                        Toast.LENGTH_LONG).show();
+                    tvEmptyMeetings.setVisibility(View.VISIBLE);
+                    meetingsRecyclerView.setVisibility(View.GONE);
                 } else {
-                    Toast.makeText(AdminDashboardActivity.this, 
-                        "Loaded " + approvedMeetings.size() + " meeting(s)", 
-                        Toast.LENGTH_SHORT).show();
+                    tvEmptyMeetings.setVisibility(View.GONE);
+                    meetingsRecyclerView.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -222,7 +217,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
             @Override
             public void run() {
                 adapter.notifyDataSetChanged();
-                handler.postDelayed(this, 1000); // Update every second
+                handler.postDelayed(this, 1000);
             }
         };
         handler.post(countdownRunnable);
@@ -301,7 +296,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             holder.tvCardDateTime.setText(meeting.getDate() + " at " + meeting.getTime());
             holder.tvCardOrganizer.setText("Organized by: " + meeting.getRequestedByName());
             
-            // Display participants
             if (meeting.getParticipants() != null && !meeting.getParticipants().isEmpty()) {
                 StringBuilder participantsText = new StringBuilder("Participants: ");
                 for (int i = 0; i < meeting.getParticipants().size(); i++) {
@@ -317,7 +311,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             
             holder.tvCountdown.setText(calculateCountdown(meeting.getDate(), meeting.getTime()));
             
-            // Admin can see all links
             holder.linkContainer.setVisibility(View.VISIBLE);
             if (meeting.getMeetingLink() != null && !meeting.getMeetingLink().isEmpty()) {
                 holder.tvMeetingLink.setText(meeting.getMeetingLink());
@@ -376,34 +369,28 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     int pendingCount = (int) snapshot.getChildrenCount();
                     
                     if (pendingCount > 0 && !hasSeenRequests) {
-                        // Show notification
                         String message = pendingCount == 1 
                             ? "You have a new meeting request" 
                             : "You have " + pendingCount + " new meeting requests";
                         notificationText.setText(message);
                         notificationBanner.setVisibility(View.VISIBLE);
                     } else if (pendingCount == 0) {
-                        // Hide notification if no pending requests
                         notificationBanner.setVisibility(View.GONE);
                         hasSeenRequests = false;
                     }
                 }
 
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    // Handle error silently
-                }
+                public void onCancelled(@NonNull DatabaseError error) {}
             });
     }
     
     private void setupNotificationListeners() {
-        // Dismiss notification when X is clicked
         dismissNotification.setOnClickListener(v -> {
             notificationBanner.setVisibility(View.GONE);
             hasSeenRequests = true;
         });
         
-        // When user clicks on the notification, navigate to requests and mark as seen
         notificationBanner.setOnClickListener(v -> {
             hasSeenRequests = true;
             notificationBanner.setVisibility(View.GONE);
@@ -417,7 +404,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Reset the seen flag when returning to dashboard
         hasSeenRequests = false;
         checkForNewMeetingRequests();
     }

@@ -222,7 +222,7 @@ public class SettingsActivity extends AppCompatActivity {
                 ArrayList<User> users = new ArrayList<>();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
-                    if (user != null) {
+                    if (user != null && user.getRole() != null && user.getRole().equalsIgnoreCase("user")) {
                         users.add(user);
                     }
                 }
@@ -306,6 +306,13 @@ public class SettingsActivity extends AppCompatActivity {
                     return;
                 }
                 
+                if (adminUsers.size() == 1) {
+                    Toast.makeText(SettingsActivity.this, 
+                        "Cannot remove the last admin. There must be at least one admin.", 
+                        Toast.LENGTH_LONG).show();
+                    return;
+                }
+                
                 AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
                 View dialogView = LayoutInflater.from(SettingsActivity.this)
                     .inflate(R.layout.dialog_user_selection, null);
@@ -320,10 +327,11 @@ public class SettingsActivity extends AppCompatActivity {
                 AlertDialog dialog = builder.create();
                 
                 usersRecyclerView.setLayoutManager(new LinearLayoutManager(SettingsActivity.this));
+                final int totalAdmins = adminUsers.size();
                 UserSelectionAdapter adapter = new UserSelectionAdapter(adminUsers, new UserSelectionAdapter.OnUserClickListener() {
                     @Override
                     public void onUserClick(User user) {
-                        removeAdminPrivileges(user, dialog);
+                        removeAdminPrivileges(user, dialog, totalAdmins);
                     }
                 });
                 usersRecyclerView.setAdapter(adapter);
@@ -342,12 +350,18 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
     
-    private void removeAdminPrivileges(User user, AlertDialog dialog) {
+    private void removeAdminPrivileges(User user, AlertDialog dialog, int totalAdmins) {
+        if (totalAdmins <= 1) {
+            Toast.makeText(this, 
+                "Cannot remove the last admin. There must be at least one admin.", 
+                Toast.LENGTH_LONG).show();
+            return;
+        }
+        
         new AlertDialog.Builder(this)
             .setTitle("Remove Admin Privileges")
             .setMessage("Remove admin privileges from " + user.getName() + "?")
             .setPositiveButton("Yes", (d, which) -> {
-                // Update the user's role to User
                 usersReference.child(user.getUserId()).child("role").setValue("User")
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(SettingsActivity.this, 
@@ -365,7 +379,6 @@ public class SettingsActivity extends AppCompatActivity {
             .show();
     }
     
-    // Adapter for selecting a user to make admin
     static class UserSelectionAdapter extends RecyclerView.Adapter<UserSelectionAdapter.ViewHolder> {
         
         interface OnUserClickListener {
@@ -398,7 +411,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (role.equals("admin")) {
                 holder.tvUserInitial.setText("A");
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();
-                background.setColor(Color.parseColor("#2C3E50"));
+                background.setColor(Color.parseColor("#141f64"));
             } else {
                 holder.tvUserInitial.setText("U");
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();
@@ -427,7 +440,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
     
-    // Adapter for editing/deleting users
     static class UserEditAdapter extends RecyclerView.Adapter<UserEditAdapter.ViewHolder> {
         
         interface OnUserActionListener {
@@ -460,7 +472,7 @@ public class SettingsActivity extends AppCompatActivity {
             if (role.equals("admin")) {
                 holder.tvUserInitial.setText("A");
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();
-                background.setColor(Color.parseColor("#2C3E50"));
+                background.setColor(Color.parseColor("#141f64"));
             } else {
                 holder.tvUserInitial.setText("U");
                 GradientDrawable background = (GradientDrawable) holder.tvUserInitial.getBackground();

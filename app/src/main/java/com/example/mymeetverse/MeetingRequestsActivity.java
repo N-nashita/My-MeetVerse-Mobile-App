@@ -56,7 +56,6 @@ public class MeetingRequestsActivity extends AppCompatActivity {
         tvEmptyState = findViewById(R.id.tvEmptyState);
         meetingRequests = new ArrayList<>();
 
-        // Get admin info from intent
         Intent receivedIntent = getIntent();
         adminEmail = receivedIntent.getStringExtra("ADMIN_EMAIL");
         adminName = receivedIntent.getStringExtra("ADMIN_NAME");
@@ -178,16 +177,13 @@ public class MeetingRequestsActivity extends AppCompatActivity {
     }
 
     private void approveMeeting(Meeting meeting) {
-        // Generate unique meeting link
         String uniqueLink = "https://meet.mymeetverse.com/" + UUID.randomUUID().toString().substring(0, 8);
         meeting.setMeetingLink(uniqueLink);
         meeting.setStatus("approved");
         
-        // Save to ApprovedMeetings
         approvedMeetingsReference.child(meeting.getMeetingId()).setValue(meeting)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    // Update status in MeetingRequests
                     meetingsReference.child(meeting.getMeetingId()).child("status").setValue("approved")
                         .addOnCompleteListener(task2 -> {
                             if (task2.isSuccessful()) {
@@ -204,7 +200,6 @@ public class MeetingRequestsActivity extends AppCompatActivity {
         meeting.setStatus("rejected");
         meeting.setTimestamp(System.currentTimeMillis());
         
-        // Save to MeetingHistory
         DatabaseReference historyRef = FirebaseDatabase.getInstance(
             "https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
             .getReference("MeetingHistory");
@@ -212,7 +207,6 @@ public class MeetingRequestsActivity extends AppCompatActivity {
         historyRef.child(meeting.getMeetingId()).setValue(meeting)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    // Update status in MeetingRequests
                     meetingsReference.child(meeting.getMeetingId()).child("status").setValue("rejected")
                         .addOnCompleteListener(task2 -> {
                             if (task2.isSuccessful()) {

@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText emailField, passwordField;
     Button btnLogin;
     DatabaseReference databaseReference;
+    FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordField = findViewById(R.id.passwordField);
         btnLogin = findViewById(R.id.btnLogin);
 
+        firebaseAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         databaseReference = database.getReference("Users");
 
@@ -42,46 +46,52 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
-            databaseReference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                            User user = userSnapshot.getValue(User.class);
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            databaseReference.orderByChild("email").equalTo(email)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                                User user = userSnapshot.getValue(User.class);
+                                                if (user != null) {
+                                                    Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
 
-                            if (user != null && user.getPassword().equals(password)) {
-                                Toast.makeText(LoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                                                    Intent intent;
+                                                    if (user.getRole() != null && user.getRole().equalsIgnoreCase("admin")) {
+                                                        intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                                                        intent.putExtra("ADMIN_NAME", user.getName());
+                                                        intent.putExtra("ADMIN_EMAIL", user.getEmail());
+                                                    } else {
+                                                        intent = new Intent(LoginActivity.this, UserdashboardActivity.class);
+                                                        intent.putExtra("USER_NAME", user.getName());
+                                                        intent.putExtra("USER_EMAIL", user.getEmail());
+                                                        intent.putExtra("USER_ROLE", user.getRole());
+                                                    }
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                                    startActivity(intent);
+                                                    finish();
+                                                    return;
+                                                }
+                                            }
+                                        }
+                                    }
 
-                                Intent intent;
-                                if (user.getRole() != null && user.getRole().equalsIgnoreCase("admin")) {
-                                    intent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
-                                    intent.putExtra("ADMIN_NAME", user.getName());
-                                    intent.putExtra("ADMIN_EMAIL", user.getEmail());
-                                } else {
-                                    intent = new Intent(LoginActivity.this, UserdashboardActivity.class);
-                                    intent.putExtra("USER_NAME", user.getName());
-                                    intent.putExtra("USER_EMAIL", user.getEmail());
-                                    intent.putExtra("USER_ROLE", user.getRole());
-                                }
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
-                                return;
-                            } else {
-                                Toast.makeText(LoginActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                         }
                     } else {
-                        Toast.makeText(LoginActivity.this, "Email not registered", Toast.LENGTH_SHORT).show();
+                        String errorMessage = task.getException() != null ? task.getException().getMessage() : "Login failed";
+                        Toast.makeText(LoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                });
         });
     }
 }

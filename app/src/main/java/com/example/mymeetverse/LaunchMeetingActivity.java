@@ -70,7 +70,6 @@ public class LaunchMeetingActivity extends AppCompatActivity {
         selectedParticipants = new ArrayList<>();
         allUsers = new ArrayList<>();
 
-        // Get user info from intent
         Intent intent = getIntent();
         userEmail = intent.getStringExtra("USER_EMAIL");
         userName = intent.getStringExtra("USER_NAME");
