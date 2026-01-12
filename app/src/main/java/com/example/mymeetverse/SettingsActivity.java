@@ -54,7 +54,6 @@ public class SettingsActivity extends AppCompatActivity {
         btnEditUsers = findViewById(R.id.btnEditUsers);
         btnRemoveAdmin = findViewById(R.id.btnRemoveAdmin);
         
-        // Get admin info from intent
         Intent receivedIntent = getIntent();
         adminEmail = receivedIntent.getStringExtra("ADMIN_EMAIL");
         adminName = receivedIntent.getStringExtra("ADMIN_NAME");
@@ -121,6 +120,8 @@ public class SettingsActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(SettingsActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     finish();
                 }
                 
@@ -197,7 +198,6 @@ public class SettingsActivity extends AppCompatActivity {
             .setTitle("Change Admin")
             .setMessage("Make " + user.getName() + " the new admin?")
             .setPositiveButton("Yes", (d, which) -> {
-                // Update the user's role to admin
                 usersReference.child(user.getUserId()).child("role").setValue("Admin")
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(SettingsActivity.this, 

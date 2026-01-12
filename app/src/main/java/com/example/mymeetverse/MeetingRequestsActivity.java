@@ -36,6 +36,7 @@ public class MeetingRequestsActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     ListView requestsListView;
+    TextView tvEmptyState;
     ArrayList<Meeting> meetingRequests;
     MeetingRequestAdapter adapter;
     DatabaseReference meetingsReference;
@@ -52,6 +53,7 @@ public class MeetingRequestsActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
         requestsListView = findViewById(R.id.requestsListView);
+        tvEmptyState = findViewById(R.id.tvEmptyState);
         meetingRequests = new ArrayList<>();
 
         // Get admin info from intent
@@ -123,6 +125,8 @@ public class MeetingRequestsActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(MeetingRequestsActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MeetingRequestsActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     finish();
                 }
                 
@@ -156,8 +160,11 @@ public class MeetingRequestsActivity extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                     
                     if (meetingRequests.isEmpty()) {
-                        Toast.makeText(MeetingRequestsActivity.this, 
-                            "No pending requests", Toast.LENGTH_SHORT).show();
+                        tvEmptyState.setVisibility(View.VISIBLE);
+                        requestsListView.setVisibility(View.GONE);
+                    } else {
+                        tvEmptyState.setVisibility(View.GONE);
+                        requestsListView.setVisibility(View.VISIBLE);
                     }
                 }
 
@@ -194,10 +201,24 @@ public class MeetingRequestsActivity extends AppCompatActivity {
     }
 
     private void rejectMeeting(Meeting meeting) {
-        meetingsReference.child(meeting.getMeetingId()).child("status").setValue("rejected")
+        meeting.setStatus("rejected");
+        meeting.setTimestamp(System.currentTimeMillis());
+        
+        // Save to MeetingHistory
+        DatabaseReference historyRef = FirebaseDatabase.getInstance(
+            "https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
+            .getReference("MeetingHistory");
+        
+        historyRef.child(meeting.getMeetingId()).setValue(meeting)
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Toast.makeText(this, "Meeting rejected", Toast.LENGTH_SHORT).show();
+                    // Update status in MeetingRequests
+                    meetingsReference.child(meeting.getMeetingId()).child("status").setValue("rejected")
+                        .addOnCompleteListener(task2 -> {
+                            if (task2.isSuccessful()) {
+                                Toast.makeText(this, "Meeting rejected and moved to history", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 } else {
                     Toast.makeText(this, "Failed to reject meeting", Toast.LENGTH_SHORT).show();
                 }

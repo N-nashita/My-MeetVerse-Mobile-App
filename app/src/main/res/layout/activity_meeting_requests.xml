@@ -38,6 +38,16 @@
                 android:layout_marginStart="16dp"/>
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="No meeting request"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:visibility="gone"/>
+
         <ListView
             android:id="@+id/requestsListView"
             android:layout_width="match_parent"

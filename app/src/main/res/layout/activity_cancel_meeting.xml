@@ -31,75 +31,56 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="MeetVerse"
+                android:text="Cancel Meeting"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginStart="16dp"/>
         </LinearLayout>
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:fillViewport="true">
 
             <LinearLayout
-                android:id="@+id/notificationBanner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#2c84e3ef"
-                android:padding="12dp"
-                android:gravity="center_vertical"
-                android:visibility="gone">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_dialog_info"
-                    android:tint="@android:color/white"
-                    android:contentDescription="Notification"
-                    android:layout_marginEnd="12dp"/>
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/notificationText"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="You have a meeting"
+                    android:text="Your Meetings"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
                     android:textColor="@android:color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"/>
 
-                <ImageView
-                    android:id="@+id/dismissNotification"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:tint="@android:color/white"
-                    android:contentDescription="Dismiss"
-                    android:clickable="true"
-                    android:focusable="true"/>
+                <TextView
+                    android:id="@+id/tvEmptyMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="You have no meetings to cancel"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="32dp"
+                    android:visibility="gone"/>
+
+                <ListView
+                    android:id="@+id/meetingsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="12dp"/>
+
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Approved Meetings"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:textColor="@android:color/white"
-                android:layout_margin="16dp"/>
+        </ScrollView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/meetingsRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp"
-                android:clipToPadding="false"/>
-
-        </LinearLayout>
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView

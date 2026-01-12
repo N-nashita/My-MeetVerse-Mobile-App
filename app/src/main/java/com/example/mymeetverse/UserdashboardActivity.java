@@ -45,6 +45,9 @@ public class UserdashboardActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     RecyclerView meetingsRecyclerView;
+    LinearLayout notificationBanner;
+    TextView notificationText;
+    ImageView dismissNotification;
     
     String userEmail, userName, userRole;
     ArrayList<Meeting> approvedMeetings;
@@ -110,8 +113,16 @@ public class UserdashboardActivity extends AppCompatActivity {
                     intent.putExtra("USER_NAME", userName);
                     intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
+                } else if (id == R.id.nav_cancel_meeting) {
+                    Intent intent = new Intent(UserdashboardActivity.this, CancelMeetingActivity.class);
+                    intent.putExtra("USER_EMAIL", userEmail);
+                    intent.putExtra("USER_NAME", userName);
+                    intent.putExtra("USER_ROLE", userRole);
+                    startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(UserdashboardActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(UserdashboardActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     finish();
                 }
                 
@@ -158,10 +169,11 @@ public class UserdashboardActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 approvedMeetings.clear();
+                
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Meeting meeting = dataSnapshot.getValue(Meeting.class);
                     if (meeting != null) {
-                        if (isMeetingExpired(meeting)) {  // Check if meeting has expired
+                        if (isMeetingExpired(meeting)) {
                             moveToHistory(meeting);
                         } else {
                             approvedMeetings.add(meeting);
@@ -183,6 +195,24 @@ public class UserdashboardActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    
+    private boolean isUserParticipant(Meeting meeting) {
+        if (userEmail == null) {
+            return false;
+        }
+        
+        if (meeting.getParticipants() == null || meeting.getParticipants().isEmpty()) {
+            return false;
+        }
+        
+        // Check if user is in the participants list
+        for (String participantEmail : meeting.getParticipants()) {
+            if (participantEmail != null && participantEmail.trim().equalsIgnoreCase(userEmail.trim())) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private void startCountdownUpdates() {
@@ -350,4 +380,8 @@ public class UserdashboardActivity extends AppCompatActivity {
             }
         }
     }
+    
+
+    
+
 }

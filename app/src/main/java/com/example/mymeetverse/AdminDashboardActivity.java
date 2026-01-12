@@ -45,13 +45,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
     NavigationView navigationView;
     ImageView menuIcon;
     RecyclerView meetingsRecyclerView;
+    LinearLayout notificationBanner;
+    TextView notificationText;
+    ImageView dismissNotification;
     
     String adminEmail, adminName;
     ArrayList<Meeting> approvedMeetings;
     MeetingCardAdapter adapter;
     DatabaseReference approvedMeetingsReference;
+    DatabaseReference meetingRequestsReference;
     Handler handler;
     Runnable countdownRunnable;
+    boolean hasSeenRequests = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +67,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
         meetingsRecyclerView = findViewById(R.id.meetingsRecyclerView);
+        notificationBanner = findViewById(R.id.notificationBanner);
+        notificationText = findViewById(R.id.notificationText);
+        dismissNotification = findViewById(R.id.dismissNotification);
 
         // Get admin info from intent login
         Intent receivedIntent = getIntent();
@@ -79,12 +87,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://my-meetverse-app-default-rtdb.asia-southeast1.firebasedatabase.app/");
         approvedMeetingsReference = database.getReference("ApprovedMeetings");
+        meetingRequestsReference = database.getReference("MeetingRequests");
         
         handler = new Handler();
         
         setupNavigationHeader();
         loadApprovedMeetings();
         startCountdownUpdates();
+        checkForNewMeetingRequests();
+        setupNotificationListeners();
 
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
 
@@ -119,6 +130,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(AdminDashboardActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(AdminDashboardActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     finish();
                 }
                 
@@ -353,5 +366,59 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 linkContainer = itemView.findViewById(R.id.linkContainer);
             }
         }
+    }
+    
+    private void checkForNewMeetingRequests() {
+        meetingRequestsReference.orderByChild("status").equalTo("pending")
+            .addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    int pendingCount = (int) snapshot.getChildrenCount();
+                    
+                    if (pendingCount > 0 && !hasSeenRequests) {
+                        // Show notification
+                        String message = pendingCount == 1 
+                            ? "You have a new meeting request" 
+                            : "You have " + pendingCount + " new meeting requests";
+                        notificationText.setText(message);
+                        notificationBanner.setVisibility(View.VISIBLE);
+                    } else if (pendingCount == 0) {
+                        // Hide notification if no pending requests
+                        notificationBanner.setVisibility(View.GONE);
+                        hasSeenRequests = false;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    // Handle error silently
+                }
+            });
+    }
+    
+    private void setupNotificationListeners() {
+        // Dismiss notification when X is clicked
+        dismissNotification.setOnClickListener(v -> {
+            notificationBanner.setVisibility(View.GONE);
+            hasSeenRequests = true;
+        });
+        
+        // When user clicks on the notification, navigate to requests and mark as seen
+        notificationBanner.setOnClickListener(v -> {
+            hasSeenRequests = true;
+            notificationBanner.setVisibility(View.GONE);
+            Intent intent = new Intent(AdminDashboardActivity.this, MeetingRequestsActivity.class);
+            intent.putExtra("ADMIN_EMAIL", adminEmail);
+            intent.putExtra("ADMIN_NAME", adminName);
+            startActivity(intent);
+        });
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Reset the seen flag when returning to dashboard
+        hasSeenRequests = false;
+        checkForNewMeetingRequests();
     }
 }

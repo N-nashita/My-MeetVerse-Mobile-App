@@ -181,8 +181,16 @@ public class LaunchMeetingActivity extends AppCompatActivity {
                     intent.putExtra("USER_NAME", userName);
                     intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
+                } else if (id == R.id.nav_cancel_meeting) {
+                    Intent intent = new Intent(LaunchMeetingActivity.this, CancelMeetingActivity.class);
+                    intent.putExtra("USER_EMAIL", userEmail);
+                    intent.putExtra("USER_NAME", userName);
+                    intent.putExtra("USER_ROLE", userRole);
+                    startActivity(intent);
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(LaunchMeetingActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LaunchMeetingActivity.this, LoginActivity.class);
+                    startActivity(intent);
                     finish();
                 }
                 

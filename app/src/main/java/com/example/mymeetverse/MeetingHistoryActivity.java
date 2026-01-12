@@ -125,6 +125,16 @@ public class MeetingHistoryActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(MeetingHistoryActivity.this, "Settings", Toast.LENGTH_SHORT).show();
                     }
+                } else if (id == R.id.nav_cancel_meeting) {
+                    if (userRole != null && userRole.equalsIgnoreCase("user")) {
+                        Intent intent = new Intent(MeetingHistoryActivity.this, CancelMeetingActivity.class);
+                        intent.putExtra("USER_EMAIL", userEmail);
+                        intent.putExtra("USER_NAME", userName);
+                        intent.putExtra("USER_ROLE", userRole);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MeetingHistoryActivity.this, "Cancel Meeting", Toast.LENGTH_SHORT).show();
+                    }
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(MeetingHistoryActivity.this, "Logging out...", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MeetingHistoryActivity.this, LoginActivity.class);
@@ -218,10 +228,18 @@ public class MeetingHistoryActivity extends AppCompatActivity {
             holder.tvHistoryDescription.setText(meeting.getDescription());
             holder.tvHistoryDateTime.setText(meeting.getDate() + " at " + meeting.getTime());
             holder.tvHistoryOrganizer.setText("Organized by: " + meeting.getRequestedByName());
-            holder.tvHistoryStatus.setText("Status: Completed");
+            
+            // Display actual status (rejected, approved, completed, etc.)
+            String status = meeting.getStatus();
+            if (status != null && status.equalsIgnoreCase("rejected")) {
+                holder.tvHistoryStatus.setText("Status: Rejected");
+            } else {
+                holder.tvHistoryStatus.setText("Status: Completed");
+            }
             
             SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault());
-            holder.tvHistoryTimestamp.setText("Completed: " + sdf.format(meeting.getTimestamp()));
+            String timestampLabel = (status != null && status.equalsIgnoreCase("rejected")) ? "Rejected: " : "Completed: ";
+            holder.tvHistoryTimestamp.setText(timestampLabel + sdf.format(meeting.getTimestamp()));
         }
 
         @Override

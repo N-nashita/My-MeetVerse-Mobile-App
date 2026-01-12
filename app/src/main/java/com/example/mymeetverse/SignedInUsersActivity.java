@@ -119,6 +119,16 @@ public class SignedInUsersActivity extends AppCompatActivity {
                     intent.putExtra("USER_NAME", userName);
                     intent.putExtra("USER_ROLE", userRole);
                     startActivity(intent);
+                } else if (id == R.id.nav_cancel_meeting) {
+                    if (userRole != null && userRole.equalsIgnoreCase("user")) {
+                        Intent intent = new Intent(SignedInUsersActivity.this, CancelMeetingActivity.class);
+                        intent.putExtra("USER_EMAIL", userEmail);
+                        intent.putExtra("USER_NAME", userName);
+                        intent.putExtra("USER_ROLE", userRole);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(SignedInUsersActivity.this, "Cancel Meeting", Toast.LENGTH_SHORT).show();
+                    }
                 } else if (id == R.id.nav_logout) {
                     Toast.makeText(SignedInUsersActivity.this, "Logging out  ...", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(SignedInUsersActivity.this, LoginActivity.class);
