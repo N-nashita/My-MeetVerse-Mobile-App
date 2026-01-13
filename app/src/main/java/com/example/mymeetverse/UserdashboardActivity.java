@@ -66,11 +66,23 @@ public class UserdashboardActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.navigationView);
         menuIcon = findViewById(R.id.menuIcon);
         meetingsRecyclerView = findViewById(R.id.meetingsRecyclerView);
+        tvEmptyMeetings = findViewById(R.id.tvEmptyMeetings);
+        notificationBanner = findViewById(R.id.notificationBanner);
+        notificationText = findViewById(R.id.notificationText);
+        dismissNotification = findViewById(R.id.dismissNotification);
 
         Intent receivedIntent = getIntent();
         userEmail = receivedIntent.getStringExtra("USER_EMAIL");
         userName = receivedIntent.getStringExtra("USER_NAME");
         userRole = receivedIntent.getStringExtra("USER_ROLE");
+        
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "Error: User data not found. Please log in again.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        if (userName == null) userName = "User";
+        if (userRole == null) userRole = "user";
 
         approvedMeetings = new ArrayList<>();
         meetingsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -82,7 +94,12 @@ public class UserdashboardActivity extends AppCompatActivity {
         
         handler = new Handler();
         
-        setupNavigationHeader();
+        try {
+            setupNavigationHeader();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error setting up navigation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         loadApprovedMeetings();
         startCountdownUpdates();
 
@@ -142,17 +159,31 @@ public class UserdashboardActivity extends AppCompatActivity {
     }
     
     private void setupNavigationHeader() {
-        View headerView = navigationView.getHeaderView(0);
-        TextView tvHeaderInitial = headerView.findViewById(R.id.tvHeaderInitial);
-        TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
-        TextView tvHeaderEmail = headerView.findViewById(R.id.tvHeaderEmail);
-        
-        tvHeaderInitial.setText("U");
-        tvHeaderName.setText(userName != null ? userName : "User");
-        tvHeaderEmail.setText(userEmail != null ? userEmail : "user@email.com");
-        
-        GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
-        background.setColor(Color.parseColor("#7FB3D5"));
+        try {
+            View headerView = navigationView.getHeaderView(0);
+            if (headerView == null) {
+                return;
+            }
+            TextView tvHeaderInitial = headerView.findViewById(R.id.tvHeaderInitial);
+            TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
+            TextView tvHeaderEmail = headerView.findViewById(R.id.tvHeaderEmail);
+            
+            if (tvHeaderInitial != null) {
+                tvHeaderInitial.setText("U");
+                GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
+                if (background != null) {
+                    background.setColor(Color.parseColor("#7FB3D5"));
+                }
+            }
+            if (tvHeaderName != null) {
+                tvHeaderName.setText(userName != null ? userName : "User");
+            }
+            if (tvHeaderEmail != null) {
+                tvHeaderEmail.setText(userEmail != null ? userEmail : "user@email.com");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     @Override

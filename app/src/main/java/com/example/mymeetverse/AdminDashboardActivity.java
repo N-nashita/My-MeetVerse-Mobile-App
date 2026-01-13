@@ -77,7 +77,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
         adminEmail = receivedIntent.getStringExtra("ADMIN_EMAIL");
         adminName = receivedIntent.getStringExtra("ADMIN_NAME");
         
-        if (adminEmail == null) adminEmail = "admin@gmail.com";
+        // Validate required data
+        if (adminEmail == null || adminEmail.isEmpty()) {
+            Toast.makeText(this, "Error: Admin data not found. Please log in again.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         if (adminName == null) adminName = "Admin";
 
         approvedMeetings = new ArrayList<>();
@@ -91,7 +96,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
         
         handler = new Handler();
         
-        setupNavigationHeader();
+        try {
+            setupNavigationHeader();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error setting up navigation: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
         loadApprovedMeetings();
         startCountdownUpdates();
         checkForNewMeetingRequests();
@@ -151,17 +161,31 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
     
     private void setupNavigationHeader() {
-        View headerView = navigationView.getHeaderView(0);
-        TextView tvHeaderInitial = headerView.findViewById(R.id.tvHeaderInitial);
-        TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
-        TextView tvHeaderEmail = headerView.findViewById(R.id.tvHeaderEmail);
-        
-        tvHeaderInitial.setText("A");
-        tvHeaderName.setText(adminName);
-        tvHeaderEmail.setText(adminEmail);
-        
-        GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
-        background.setColor(Color.parseColor("#243a51"));
+        try {
+            View headerView = navigationView.getHeaderView(0);
+            if (headerView == null) {
+                return;
+            }
+            TextView tvHeaderInitial = headerView.findViewById(R.id.tvHeaderInitial);
+            TextView tvHeaderName = headerView.findViewById(R.id.tvHeaderName);
+            TextView tvHeaderEmail = headerView.findViewById(R.id.tvHeaderEmail);
+            
+            if (tvHeaderInitial != null) {
+                tvHeaderInitial.setText("A");
+                GradientDrawable background = (GradientDrawable) tvHeaderInitial.getBackground();
+                if (background != null) {
+                    background.setColor(Color.parseColor("#243a51"));
+                }
+            }
+            if (tvHeaderName != null) {
+                tvHeaderName.setText(adminName);
+            }
+            if (tvHeaderEmail != null) {
+                tvHeaderEmail.setText(adminEmail);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     @Override
@@ -185,7 +209,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Meeting meeting = dataSnapshot.getValue(Meeting.class);
                     if (meeting != null) {
-                        if (isMeetingExpired(meeting)) {  // Check if meeting has expired
+                        if (isMeetingExpired(meeting)) { 
                             moveToHistory(meeting);
                         } else {
                             approvedMeetings.add(meeting);
